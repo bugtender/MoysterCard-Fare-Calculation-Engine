@@ -72,4 +72,68 @@ describe('FareRules', () => {
       expect(fareRules.isPeak(isoString)).toBe(true);
     });
   });
+
+  describe('getZonePair', () => {
+    it('should create zone pair string from two zones', () => {
+      expect(FareRules.getZonePair(1, 2)).toBe('1-2');
+      expect(FareRules.getZonePair(2, 1)).toBe('2-1');
+      expect(FareRules.getZonePair(1, 1)).toBe('1-1');
+    });
+  });
+
+  describe('getFare', () => {
+    describe('zone 1-1', () => {
+      it('should return peak fare during peak hours', () => {
+        const peakTime = new Date('2025-10-13T08:00:00Z');
+        expect(fareRules.getFare(1, 1, peakTime)).toBe(30);
+      });
+
+      it('should return off-peak fare during off-peak hours', () => {
+        const offPeakTime = new Date('2025-10-13T12:00:00Z');
+        expect(fareRules.getFare(1, 1, offPeakTime)).toBe(25);
+      });
+    });
+
+    describe('zone 1-2', () => {
+      it('should return peak fare during peak hours', () => {
+        const peakTime = new Date('2025-10-13T08:00:00Z');
+        expect(fareRules.getFare(1, 2, peakTime)).toBe(35);
+      });
+
+      it('should return off-peak fare during off-peak hours', () => {
+        const offPeakTime = new Date('2025-10-13T12:00:00Z');
+        expect(fareRules.getFare(1, 2, offPeakTime)).toBe(30);
+      });
+    });
+
+    describe('zone 2-1', () => {
+      it('should return peak fare during peak hours', () => {
+        const peakTime = new Date('2025-10-13T08:00:00Z');
+        expect(fareRules.getFare(2, 1, peakTime)).toBe(35);
+      });
+
+      it('should return off-peak fare during off-peak hours', () => {
+        const offPeakTime = new Date('2025-10-13T12:00:00Z');
+        expect(fareRules.getFare(2, 1, offPeakTime)).toBe(30);
+      });
+    });
+
+    describe('zone 2-2', () => {
+      it('should return peak fare during peak hours', () => {
+        const peakTime = new Date('2025-10-13T08:00:00Z');
+        expect(fareRules.getFare(2, 2, peakTime)).toBe(25);
+      });
+
+      it('should return off-peak fare during off-peak hours', () => {
+        const offPeakTime = new Date('2025-10-13T12:00:00Z');
+        expect(fareRules.getFare(2, 2, offPeakTime)).toBe(20);
+      });
+    });
+
+    it('should throw error for invalid zone combination', () => {
+      const datetime = new Date('2025-10-13T08:00:00Z');
+      expect(() => fareRules.getFare(1, 3, datetime)).toThrow('Invalid zone combination: 1-3');
+      expect(() => fareRules.getFare(5, 2, datetime)).toThrow('Invalid zone combination: 5-2');
+    });
+  });
 });

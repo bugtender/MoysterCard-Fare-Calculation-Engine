@@ -1,4 +1,4 @@
-import { PeakHours, PeakRange } from '../types/FareTypes';
+import { PeakHours, PeakRange, FareTables } from '../types/FareTypes';
 import { isWeekend, isTimeInRange } from '../utils/date';
 
 /**
@@ -16,6 +16,13 @@ export class FareRules {
       { start: '09:00', end: '11:00' },
       { start: '18:00', end: '22:00' },
     ],
+  };
+
+  private static readonly FARES: FareTables = {
+    '1-1': { peak: 30, off_peak: 25 },
+    '1-2': { peak: 35, off_peak: 30 },
+    '2-1': { peak: 35, off_peak: 30 },
+    '2-2': { peak: 25, off_peak: 20 },
   };
 
   /**
@@ -38,5 +45,27 @@ export class FareRules {
    */
   private isTimeInAnyRange(datetime: Date | string, ranges: PeakRange[]): boolean {
     return ranges.some(({ start, end }) => isTimeInRange(datetime, start, end));
+  }
+
+  /**
+   * Calculates the fare for a journey based on zones and time
+   */
+  public getFare(fromZone: number, toZone: number, datetime: Date | string): number {
+    const zonePair = FareRules.getZonePair(fromZone, toZone);
+    const fareTable = FareRules.FARES[zonePair];
+
+    if (!fareTable) {
+      throw new Error(`Invalid zone combination: ${zonePair}`);
+    }
+
+    const isPeakTime = this.isPeak(datetime);
+    return isPeakTime ? fareTable.peak : fareTable.off_peak;
+  }
+
+  /**
+   * Creates a normalized zone pair string (e.g., "1-2")
+   */
+  public static getZonePair(fromZone: number, toZone: number): string {
+    return `${fromZone}-${toZone}`;
   }
 }

@@ -13,3 +13,18 @@ export interface PeakHours {
   weekdays: PeakRange[];
   weekends: PeakRange[];
 }
+
+/**
+ * Fare pricing for a specific zone pair
+ */
+export interface FareTable {
+  peak: number;
+  off_peak: number;
+}
+
+/**
+ * Collection of fare tables indexed by zone pair
+ */
+export interface FareTables {
+  [zonePair: string]: FareTable;
+}
