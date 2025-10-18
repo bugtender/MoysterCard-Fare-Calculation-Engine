@@ -49,4 +49,11 @@ export class Journey {
   public get fare(): number {
     return this.fareRules.getFare(this.fromZone, this.toZone, this.datetime);
   }
+
+  /**
+   * Returns the zone pair as a normalized string
+   */
+  public get zonePair(): string {
+    return FareRules.getZonePair(this.fromZone, this.toZone);
+  }
 }
