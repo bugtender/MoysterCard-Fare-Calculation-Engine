@@ -1,4 +1,4 @@
-import { PeakHours, PeakRange, FareTables } from '../types/FareTypes';
+import { PeakHours, PeakRange, FareTables, CapTables } from '../types/FareTypes';
 import { isWeekend, isTimeInRange } from '../utils/date';
 
 /**
@@ -23,6 +23,21 @@ export class FareRules {
     '1-2': { peak: 35, off_peak: 30 },
     '2-1': { peak: 35, off_peak: 30 },
     '2-2': { peak: 25, off_peak: 20 },
+  };
+
+  private static readonly CAPS: CapTables = {
+    daily: {
+      '1-1': 100,
+      '1-2': 120,
+      '2-1': 120,
+      '2-2': 80,
+    },
+    weekly: {
+      '1-1': 500,
+      '1-2': 600,
+      '2-1': 600,
+      '2-2': 400,
+    },
   };
 
   /**
@@ -67,5 +82,34 @@ export class FareRules {
    */
   public static getZonePair(fromZone: number, toZone: number): string {
     return `${fromZone}-${toZone}`;
+  }
+
+  /**
+   * Retrieves the daily cap for a specific zone pair
+   */
+  public getDailyCap(zonePair: string): number {
+    const cap = FareRules.CAPS.daily[zonePair];
+
+    if (cap === undefined) {
+      throw new Error(`No daily cap defined for zone pair: ${zonePair}`);
+    }
+
+    return cap;
+  }
+
+  /**
+   * Finds the highest daily cap among a set of zone pairs
+   */
+  public getHighestDailyCap(zonePairs: Set<string>): number {
+    let maxCap = 0;
+
+    for (const zonePair of zonePairs) {
+      const cap = this.getDailyCap(zonePair);
+      if (cap > maxCap) {
+        maxCap = cap;
+      }
+    }
+
+    return maxCap;
   }
 }

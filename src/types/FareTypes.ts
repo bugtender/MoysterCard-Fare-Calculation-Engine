@@ -28,3 +28,11 @@ export interface FareTable {
 export interface FareTables {
   [zonePair: string]: FareTable;
 }
+
+/**
+ * Daily and weekly fare cap tables
+ */
+export interface CapTables {
+  daily: { [zonePair: string]: number };
+  weekly: { [zonePair: string]: number };
+}

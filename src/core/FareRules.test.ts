@@ -136,4 +136,43 @@ describe('FareRules', () => {
       expect(() => fareRules.getFare(5, 2, datetime)).toThrow('Invalid zone combination: 5-2');
     });
   });
+
+  describe('getDailyCap', () => {
+    it('should return correct daily cap for zone 1-1', () => {
+      expect(fareRules.getDailyCap('1-1')).toBe(100);
+    });
+
+    it('should return correct daily cap for zone 1-2', () => {
+      expect(fareRules.getDailyCap('1-2')).toBe(120);
+    });
+
+    it('should return correct daily cap for zone 2-1', () => {
+      expect(fareRules.getDailyCap('2-1')).toBe(120);
+    });
+
+    it('should return correct daily cap for zone 2-2', () => {
+      expect(fareRules.getDailyCap('2-2')).toBe(80);
+    });
+
+    it('should throw error for undefined zone pair', () => {
+      expect(() => fareRules.getDailyCap('3-3')).toThrow('No daily cap defined for zone pair: 3-3');
+    });
+  });
+
+  describe('getHighestDailyCap', () => {
+    it('should return highest cap from single zone pair', () => {
+      const zonePairs = new Set(['1-1']);
+      expect(fareRules.getHighestDailyCap(zonePairs)).toBe(100);
+    });
+
+    it('should return highest cap from multiple zone pairs', () => {
+      const zonePairs = new Set(['1-1', '2-2', '1-2']);
+      expect(fareRules.getHighestDailyCap(zonePairs)).toBe(120); // 1-2 has highest cap
+    });
+
+    it('should return 0 for empty set', () => {
+      const zonePairs = new Set<string>();
+      expect(fareRules.getHighestDailyCap(zonePairs)).toBe(0);
+    });
+  });
 });
