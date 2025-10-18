@@ -46,3 +46,13 @@ export function toUtcDayjs(datetime: Date | string): Dayjs {
 export function formatDate(datetime: Date | string): string {
   return dayjs(datetime).format('YYYY-MM-DD');
 }
+
+/**
+ * Gets the ISO week key in format YYYY-WW
+ */
+export function getIsoWeekKey(datetime: Date | string): string {
+  const date = dayjs(datetime);
+  const year = date.isoWeekYear();
+  const week = date.isoWeek();
+  return `${year}-W${String(week).padStart(2, '0')}`;
+}

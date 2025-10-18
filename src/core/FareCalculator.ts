@@ -1,16 +1,43 @@
 import { Journey } from './Journey';
 import { FareRules } from './FareRules';
 import { JourneyInput } from '../types/JourneyInput';
-import { formatDate } from '../utils/date';
+import { formatDate, getIsoWeekKey } from '../utils/date';
 import { DailyFareData } from '../types/DailyFareData';
+
 /**
- * FareCalculator is the entry point for computing daily journey fares.
+ * FareCalculator is the entry point for computing daily and weekly journey fares.
  */
 export class FareCalculator {
   private readonly fareRules: FareRules;
 
   constructor(fareRules?: FareRules) {
     this.fareRules = fareRules || new FareRules();
+  }
+
+  /**
+   * Auto-selects calculation method based on journey span:
+   * - Single day: uses calculateDaily
+   * - Single week: uses calculateWeekly
+   * - Multiple weeks: calculates each week separately and sums
+   */
+  public calculate(journeyInputs: JourneyInput[]): number {
+    if (journeyInputs.length === 0) {
+      return 0;
+    }
+
+    const journeys = this.createJourneys(journeyInputs);
+
+    if (this.isJourneyInSingleDay(journeys)) {
+      return this.calculateDaily(journeyInputs);
+    }
+
+    const weeklyGroups = this.groupByWeek(journeyInputs);
+
+    if (weeklyGroups.size === 1) {
+      return this.calculateWeekly(journeyInputs);
+    }
+
+    return this.calculateMultipleWeeks(weeklyGroups);
   }
 
   /**
@@ -130,5 +157,45 @@ export class FareCalculator {
     }
 
     return weeklyTotal;
+  }
+
+  /**
+   * Checks if all journeys occur on the same day
+   */
+  private isJourneyInSingleDay(journeys: Journey[]): boolean {
+    const uniqueDays = new Set(journeys.map((j) => formatDate(j.datetime)));
+    return uniqueDays.size === 1;
+  }
+
+  /**
+   * Groups journey inputs by ISO week (Monday-Sunday)
+   */
+  private groupByWeek(journeyInputs: JourneyInput[]): Map<string, JourneyInput[]> {
+    const weeklyMap = new Map<string, JourneyInput[]>();
+
+    for (const input of journeyInputs) {
+      const weekKey = getIsoWeekKey(input.datetime);
+
+      if (!weeklyMap.has(weekKey)) {
+        weeklyMap.set(weekKey, []);
+      }
+
+      weeklyMap.get(weekKey)!.push(input);
+    }
+
+    return weeklyMap;
+  }
+
+  /**
+   * Calculates fare for multiple weeks independently
+   */
+  private calculateMultipleWeeks(weeklyGroups: Map<string, JourneyInput[]>): number {
+    let totalFare = 0;
+
+    for (const weekJourneys of weeklyGroups.values()) {
+      totalFare += this.calculateWeekly(weekJourneys);
+    }
+
+    return totalFare;
   }
 }
