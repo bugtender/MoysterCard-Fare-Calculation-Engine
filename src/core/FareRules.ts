@@ -98,6 +98,19 @@ export class FareRules {
   }
 
   /**
+   * Retrieves the weekly cap for a specific zone pair
+   */
+  public getWeeklyCap(zonePair: string): number {
+    const cap = FareRules.CAPS.weekly[zonePair];
+
+    if (cap === undefined) {
+      throw new Error(`No weekly cap defined for zone pair: ${zonePair}`);
+    }
+
+    return cap;
+  }
+
+  /**
    * Finds the highest daily cap among a set of zone pairs
    */
   public getHighestDailyCap(zonePairs: Set<string>): number {
@@ -105,6 +118,22 @@ export class FareRules {
 
     for (const zonePair of zonePairs) {
       const cap = this.getDailyCap(zonePair);
+      if (cap > maxCap) {
+        maxCap = cap;
+      }
+    }
+
+    return maxCap;
+  }
+
+  /**
+   * Finds the highest weekly cap among a set of zone pairs
+   */
+  public getHighestWeeklyCap(zonePairs: Set<string>): number {
+    let maxCap = 0;
+
+    for (const zonePair of zonePairs) {
+      const cap = this.getWeeklyCap(zonePair);
       if (cap > maxCap) {
         maxCap = cap;
       }

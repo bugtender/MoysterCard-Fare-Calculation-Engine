@@ -175,4 +175,45 @@ describe('FareRules', () => {
       expect(fareRules.getHighestDailyCap(zonePairs)).toBe(0);
     });
   });
+
+  describe('getWeeklyCap', () => {
+    it('should return correct weekly cap for zone 1-1', () => {
+      expect(fareRules.getWeeklyCap('1-1')).toBe(500);
+    });
+
+    it('should return correct weekly cap for zone 1-2', () => {
+      expect(fareRules.getWeeklyCap('1-2')).toBe(600);
+    });
+
+    it('should return correct weekly cap for zone 2-1', () => {
+      expect(fareRules.getWeeklyCap('2-1')).toBe(600);
+    });
+
+    it('should return correct weekly cap for zone 2-2', () => {
+      expect(fareRules.getWeeklyCap('2-2')).toBe(400);
+    });
+
+    it('should throw error for undefined zone pair', () => {
+      expect(() => fareRules.getWeeklyCap('3-3')).toThrow(
+        'No weekly cap defined for zone pair: 3-3'
+      );
+    });
+  });
+
+  describe('getHighestWeeklyCap', () => {
+    it('should return highest weekly cap from single zone pair', () => {
+      const zonePairs = new Set(['2-2']);
+      expect(fareRules.getHighestWeeklyCap(zonePairs)).toBe(400);
+    });
+
+    it('should return highest weekly cap from multiple zone pairs', () => {
+      const zonePairs = new Set(['1-1', '2-2', '1-2']);
+      expect(fareRules.getHighestWeeklyCap(zonePairs)).toBe(600); // 1-2 has highest weekly cap
+    });
+
+    it('should return 0 for empty set', () => {
+      const zonePairs = new Set<string>();
+      expect(fareRules.getHighestWeeklyCap(zonePairs)).toBe(0);
+    });
+  });
 });
