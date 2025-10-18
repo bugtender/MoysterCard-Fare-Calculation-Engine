@@ -110,7 +110,7 @@ const journeys: JourneyInput[] = [
 
 const calculator = new FareCalculator();
 console.log(calculator.calculate(journeys)); // 120 (daily cap)
-
+```
 
 ## Tech Stack
 
