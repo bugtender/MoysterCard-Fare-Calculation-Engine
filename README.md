@@ -95,6 +95,7 @@ Test suites cover:
 - ✅ Weekly capping (progressive, multi-zone)
 - ✅ Single-week and multi-week scenarios
 - ✅ Edge cases (empty inputs, invalid data)
+- ✅ The two examples from the instruction document (`src/examples.test.ts`)
 
 
 ## Example

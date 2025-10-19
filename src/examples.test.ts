@@ -1,15 +1,15 @@
 import { FareCalculator } from './core/FareCalculator';
 import { JourneyInput } from './types/JourneyInput';
 
-describe('examples', () => {
+describe('FareCalculator —— Official Assignment Examples', () => {
   let calculator: FareCalculator;
 
   beforeEach(() => {
     calculator = new FareCalculator();
   });
 
-  describe('example 1', () => {
-    it('daily cap reached', () => {
+  describe('1.Daily Cap', () => {
+    it('should apply daily cap correctly when total fare exceeds the limit', () => {
       const journeys: JourneyInput[] = [
         // Monday
         { datetime: '2025-10-13T10:20:00Z', fromZone: 2, toZone: 1 }, // 35
@@ -22,8 +22,10 @@ describe('examples', () => {
 
       expect(calculator.calculate(journeys)).toBe(120);
     });
+  });
 
-    it('weekly cap reached', () => {
+  describe('2. Weekly Cap', () => {
+    it('should correctly apply daily and weekly caps across multiple days and weeks', () => {
       const journeys: JourneyInput[] = [
         // Week 1 (Oct 13-19, 2025): Monday to Sunday, hitting weekly cap
         { datetime: '2025-10-13T08:00:00Z', fromZone: 1, toZone: 2 }, // Mon, 35
